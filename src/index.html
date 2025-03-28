@@ -3,6 +3,63 @@
   <head>
     <title>Control</title>
     <link rel="icon" type="image/x-icon" href="images/favicon.svg">
+
+    <style>
+      body {
+          background-color: #000;
+          color: #fff;
+          font-family: Arial, sans-serif;
+          /*display: flex;*/
+          justify-content: center;
+          align-items: center;
+          min-height: 100vh;
+          margin: 0;
+      }
+
+      .game-container {
+          background-color: #15202B;
+          padding: 20px;
+          border-radius: 12px;
+          border: 1px solid #38444D;
+      }
+      
+      .board {
+          display: grid;
+          /*change for number of columns*/
+          grid-template-columns: repeat(7, 60px);
+          gap: 5px;
+          background-color: #192734;
+          padding: 10px;
+          border-radius: 8px;
+      }
+
+      .cell {
+          width: 60px;
+          height: 60px;
+          background-color: #000;
+          border-radius: 50%;
+          cursor: pointer;
+          transition: background-color 0.3s;
+      }
+
+      .cell:hover {
+          background-color: #1A2A3A;
+      }
+
+      .red {
+          background-color: #FF4500;
+      }
+
+      .blue {
+          background-color: #1DA1F2;
+      }
+
+      .status {
+          text-align: center;
+          margin-top: 20px;
+          font-size: 18px;
+      }
+  </style>
   </head>
 
   <body>
@@ -11,9 +68,16 @@
     <b>Connect 4</b><br>
       <br> Current Data:<span id="data1"></span>
     </font>
-    <br><button id="connectbutton" onclick="start()">Refresh Data</button><br>
+    <br><button id="connectbutton" onclick="refresh()">Refresh Data</button>
+    <br><br>
+    <div class="game-container">
+      <div class="board" id="board"></div>
+      <div class="status" id="status">Player 1 (Red)'s turn</div>
+    </div>
   </body>
 </html>
 
-<script src="https://code.jquery.com/jquery-3.6.4.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"
+  integrity="sha256-oP6HI9z1XaZNBrJURtCoUT5SUnxFr8s3BzRl+cbzUq8="
+	crossorigin="anonymous" type="text/javascript" charset="utf-8"></script>
 <script src="game.js" type="text/javascript" charset="utf-8"></script>

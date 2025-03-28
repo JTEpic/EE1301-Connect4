@@ -2,8 +2,6 @@
 
 This firmware project was created using [Particle Developer Tools](https://www.particle.io/developer-tools/) and is compatible with all [Particle Devices](https://www.particle.io/devices/).
 
-Feel free to replace this README.md file with your own content, or keep it for reference.
-
 ## Table of Contents
 - [Introduction](#introduction)
 - [Prerequisites To Use This Template](#prerequisites-to-use-this-repository)
