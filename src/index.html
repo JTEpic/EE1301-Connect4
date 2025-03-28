@@ -1,0 +1,45 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <title>Control</title>
+    <link rel="icon" type="image/x-icon" href="images/favicon.svg">
+  </head>
+
+  <body>
+    <body style="background-color:rgb(64, 64, 64);">
+    <font color="white">
+    <b>Connect 4</b><br>
+      <br> Current Data:<span id="data1"></span>
+    </font>
+    <br><button id="connectbutton" onclick="start()">Refresh Data</button><br>
+
+<script type="text/javascript">
+  // JavaScript comments work just like C
+  document.getElementById("data1").innerHTML = "REFRESH";
+</script>    
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js" type="text/javascript" charset="utf-8"></script>
+<script>
+  // global variables
+  var deviceID = "";
+  //expires:
+  var accessToken = "";
+  var baseURL = "https://api.particle.io/v1/devices/"
+</script>
+
+<script type="text/javascript">
+  function start(objButton) {
+    var varName = "temperature"; // your cloud variable name goes here
+    $.ajax({
+      url: baseURL + deviceID + '/' + varName,
+      headers: { 'Authorization': 'Bearer ' + accessToken },
+      method: 'GET',
+      success: function (resp) {
+        document.getElementById("data1").innerText = resp.result;
+      },
+    });
+  }
+</script>
+
+  </body>
+</html>
