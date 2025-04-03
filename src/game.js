@@ -40,21 +40,35 @@ function handleClick(e) {
   const row = getLowestEmptyRow(col);
   
   if (row !== -1) {
-      // Update board array
-      board[row][col] = currentPlayer;
-      
-      // Update UI
-      updateBoardUI();
-      // Check for win
-      if (checkWin(row, col)) {
-          statusElement.textContent = `Player ${currentPlayer} (${currentPlayer === 1 ? 'Red' : 'Blue'}) wins!`;
-          gameOver = true;
-          return;
-      }
-      
-      // Switch player
-      currentPlayer = currentPlayer === 1 ? 2 : 1;
-      statusElement.textContent = `Player ${currentPlayer} (${currentPlayer === 1 ? 'Red' : 'Blue'})'s turn`;
+    //send coord to board
+    //event.preventDefault();
+    var functionName = "setBoard"; // local variable functionName
+    const temp=row+","+col;
+    $.ajax({
+      url: 'https://api.particle.io/v1/devices/' + deviceID + '/' + functionName,
+      method: "POST",
+      headers: { "Authorization": "Bearer " + accessToken },
+      data: { arg: temp },
+      success: () => alert("Message Sent! \n" +
+        "(this doesn't mean it worked! \n" +
+        "i.e., may not have a valid ID/Token/FunctionName/etc.)")
+    });
+
+    // Update board array
+    board[row][col] = currentPlayer;
+    // Update UI
+    updateBoardUI();
+
+    // Check for win
+    if (checkWin(row, col)) {
+      statusElement.textContent = `Player ${currentPlayer} (${currentPlayer === 1 ? 'Red' : 'Blue'}) wins!`;
+      gameOver = true;
+      return;
+    }
+
+    // Switch player
+    currentPlayer = currentPlayer === 1 ? 2 : 1;
+    statusElement.textContent = `Player ${currentPlayer} (${currentPlayer === 1 ? 'Red' : 'Blue'})'s turn`;
   }
 }
 
@@ -114,15 +128,20 @@ function updateBoardUI() {
 }
 
 function refresh(objButton) {
-    var varName = "nextPlay"; // your cloud variable name goes here
+    var varName = "grabChip"; // your cloud variable name goes here
     $.ajax({
       url: baseURL + deviceID + '/' + varName,
       headers: { 'Authorization': 'Bearer ' + accessToken },
       method: 'GET',
       success: function (resp) {
         document.getElementById("data1").innerText = resp.result;
-        //board[row][col] = currentPlayer;
-        updateBoardUI();
+        const temp=JSON.stringify(resp.result);
+        if(temp!="null"){
+          //see if coord is empty and set
+          //board[row][col] = currentPlayer;
+          updateBoardUI();
+        }
+        
       },
     });
 }
