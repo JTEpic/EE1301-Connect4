@@ -10,7 +10,7 @@ const xLength=7,yLength=6;
 //create array and set all to 0, (0=open, 1=player 1(red), 2=player 2(blue)), 6x7
 //let board=Array(yLength).fill(Array(xLength).fill(0));
 let board = Array(yLength).fill().map(() => Array(xLength).fill(0));
-let currentPlayer = 1; //1=player 1(red), 2=player 2(blue)
+let currentPlayer = 1; //1=player 1(red)(cloud), 2=player 2(blue)(photon)
 let gameOver = false;
 
 const boardElement = document.getElementById('board');
@@ -35,6 +35,7 @@ function createBoard() {
 
 function handleClick(e) {
   if (gameOver) return;
+  //if (gameOver||currentPlayer==2) return;
   
   const col = parseInt(e.target.dataset.col);
   const row = getLowestEmptyRow(col);
@@ -67,7 +68,7 @@ function handleClick(e) {
     }
 
     // Switch player
-    currentPlayer = currentPlayer === 1 ? 2 : 1;
+    //currentPlayer = currentPlayer === 1 ? 2 : 1;
     statusElement.textContent = `Player ${currentPlayer} (${currentPlayer === 1 ? 'Red' : 'Blue'})'s turn`;
   }
 }
@@ -127,6 +128,7 @@ function updateBoardUI() {
   });
 }
 
+//refresh data, should be put into a loop according to particle's cloud limits
 function refresh(objButton) {
     var varName = "grabChip"; // your cloud variable name goes here
     $.ajax({
@@ -138,10 +140,21 @@ function refresh(objButton) {
         const temp=JSON.stringify(resp.result);
         if(temp!="null"){
           //see if coord is empty and set
+          //find location of comma
+          let loc = 0;
+          for (let x = 0; x < temp.length(); x++){
+            if (temp.charAt(x) == ',') {
+              loc = x;
+              break;
+            }
+          }
+          let row = Number(temp.substring(0, loc));
+          let col = Number(temp.substring(loc + 1, temp.length()));
+          if(board[row][col]==0)
+            board[row][col] = 2;
           //board[row][col] = currentPlayer;
           updateBoardUI();
         }
-        
       },
     });
 }

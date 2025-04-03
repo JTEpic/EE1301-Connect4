@@ -1,6 +1,7 @@
 // Include Particle Device OS APIs
 #include "Particle.h"
 #include <iostream>
+#include <string>
 
 int getLowestEmptyRow(int col);
 int setBoardFromString(String inputString);
@@ -62,9 +63,11 @@ void loop() {
     }
   }
 
+  //set lights on when board[row][col]==1
+
   // Log.info("Sending Hello World to the cloud");
   // Particle.publish("Hello world");
-  // delay( 10 * 1000 ); // milliseconds and blocking
+  // delay(1000); // milliseconds and blocking
 }
 
 //returns lowest empty row
@@ -72,7 +75,7 @@ int getLowestEmptyRow(int col) {
   for (int row = yLength-1; row >= 0; row--) {
   //for(let row=0;row<yLength;row++){
       if (board[row][col] == 0){
-        std::cout<<col+","+row;
+        Serial.println(col+","+row);
         return row;
       }
   }
@@ -80,6 +83,20 @@ int getLowestEmptyRow(int col) {
 }
 
 //gets webpage coordinate string as row,col and sets array accordingly
+//error if this cloud function too long?
 int setBoardFromString(String inputString){
-  return -1;
+  Serial.println(inputString);
+
+  //find location of comma
+  int loc=0;
+  for(int x=0;x<inputString.length();x++){
+    if(inputString.charAt(x)==','){
+      loc=x;
+      break;
+    }
+  }
+  int row=atoi(inputString.substring(0,loc));
+  int col=atoi(inputString.substring(loc+1,inputString.length()));
+  board[row][col]=1;
+  return 1;
 }
