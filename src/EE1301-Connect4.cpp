@@ -5,6 +5,7 @@
 
 int getLowestEmptyRow(int col);
 int setBoardFromString(String inputString);
+int resetBoard(String inputString);
 
 // Let Device OS manage the connection to the Particle Cloud
 SYSTEM_MODE(AUTOMATIC);
@@ -37,6 +38,7 @@ void setup() {
   }
   Particle.variable("grabChip", sendCoord);
   Particle.function("setBoard", setBoardFromString);
+  Particle.function("resetBoard", resetBoard);
   Serial.begin(9600);
 }
 
@@ -99,4 +101,9 @@ int setBoardFromString(String inputString){
   int col=atoi(inputString.substring(loc+1,inputString.length()));
   board[row][col]=1;
   return 1;
+}
+
+//resets board
+int resetBoard(String inputString){
+  return -1;
 }
