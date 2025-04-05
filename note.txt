@@ -1,10 +1,13 @@
 current goals:
 
-javascript refresh data every second or so automatically
 checkWin to work with different dimensions (4x5?)
-resetBoard functionality
 led color change delay?
 led use different pins based on row?
-checkwin on data recieved,correct player wins,update board correctly
-checkwin in photon code (use cloud function?)/LED animation
-player switching
+player switching on photon
+reset players at launch+reset button
+checkwin in photon code (use cloud function?)/LED animation based by player
+
+things to enable when done:
+
+javascript auto refresh line
+javascript handleClick player switching line

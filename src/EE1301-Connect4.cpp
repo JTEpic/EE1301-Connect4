@@ -1,8 +1,6 @@
 // Include Particle Device OS APIs
 #include "Particle.h"
 #include "neopixel.h"
-#include <iostream>
-#include <string>
 
 int getLowestEmptyRow(int col);
 int setBoardFromString(String inputString);
@@ -129,7 +127,7 @@ int setBoardFromString(String inputString){
 
   //find location of comma
   int loc=0;
-  for(int x=0;x<inputString.length();x++){
+  for(int x=0;x<(int)inputString.length();x++){
     if(inputString.charAt(x)==','){
       loc=x;
       break;
@@ -143,5 +141,10 @@ int setBoardFromString(String inputString){
 
 //resets board
 int resetBoard(String inputString){
-  return -1;
+  for(int x=0;x<xLength;x++){
+    for(int y=0;y<yLength;y++){
+      board[y][x]=0;
+    }
+  }
+  return 1;
 }

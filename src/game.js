@@ -17,6 +17,7 @@ const boardElement = document.getElementById('board');
 const statusElement = document.getElementById('status');
 
 createBoard();
+//const interval = setInterval(function(){refresh()},4000);
 
 function createBoard() {
   boardElement.innerHTML = '';
@@ -31,6 +32,20 @@ function createBoard() {
       }
   }
   updateBoardUI();
+  //calls photon function
+  //event.preventDefault();
+  var functionName = "resetBoard"; // local variable functionName
+  //empty temp necessary?
+  const temp = "";
+  $.ajax({
+    url: 'https://api.particle.io/v1/devices/' + deviceID + '/' + functionName,
+    method: "POST",
+    headers: { "Authorization": "Bearer " + accessToken },
+    data: { arg: temp },
+    success: () => alert("Message Sent! \n" +
+      "(this doesn't mean it worked! \n" +
+      "i.e., may not have a valid ID/Token/FunctionName/etc.)")
+  });
 }
 
 function handleClick(e) {
@@ -68,6 +83,7 @@ function handleClick(e) {
     }
 
     // Switch player
+    //currentPlayer=2;
     //currentPlayer = currentPlayer === 1 ? 2 : 1;
     statusElement.textContent = `Player ${currentPlayer} (${currentPlayer === 1 ? 'Red' : 'Blue'})'s turn`;
   }
@@ -150,11 +166,43 @@ function refresh(objButton) {
           }
           let row = Number(temp.substring(0, loc));
           let col = Number(temp.substring(loc + 1, temp.length()));
-          if(board[row][col]==0)
-            board[row][col] = 2;
-          //board[row][col] = currentPlayer;
-          updateBoardUI();
+          //if board has changed, else same data/no play yet
+          if(board[row][col]==0){
+            board[row][col] = currentPlayer;
+            updateBoardUI();
+            // Check for win
+            if (checkWin(row, col)) {
+              statusElement.textContent = `Player ${currentPlayer} (${currentPlayer === 1 ? 'Red' : 'Blue'}) wins!`;
+              gameOver = true;
+            }
+            currentPlayer=1;
+            statusElement.textContent = `Player ${currentPlayer} (${currentPlayer === 1 ? 'Red' : 'Blue'})'s turn`;
+          }
         }
       },
     });
+}
+
+//resets board
+function resetBoard(objButton) {
+  for (let row = 0; row < yLength; row++) {
+    for (let col = 0; col < xLength; col++) {
+        board[row][col]=0;
+    }
+  }
+  updateBoardUI();
+  //calls photon function
+  //event.preventDefault();
+  var functionName = "resetBoard"; // local variable functionName
+  //empty temp necessary?
+  const temp = "";
+  $.ajax({
+    url: 'https://api.particle.io/v1/devices/' + deviceID + '/' + functionName,
+    method: "POST",
+    headers: { "Authorization": "Bearer " + accessToken },
+    data: { arg: temp },
+    success: () => alert("Message Sent! \n" +
+      "(this doesn't mean it worked! \n" +
+      "i.e., may not have a valid ID/Token/FunctionName/etc.)")
+  });
 }
