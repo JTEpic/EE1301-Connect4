@@ -17,7 +17,7 @@ const boardElement = document.getElementById('board');
 const statusElement = document.getElementById('status');
 
 createBoard();
-//const interval = setInterval(function(){refresh()},4000);
+//const interval = setInterval(function(){refresh()},2000);
 
 function createBoard() {
   boardElement.innerHTML = '';
@@ -97,6 +97,7 @@ function getLowestEmptyRow(col) {
         return row;
       }
   }
+  console.log("Row = -1");
   return -1;
 }
 
@@ -146,6 +147,7 @@ function updateBoardUI() {
 
 //refresh data, should be put into a loop according to particle's cloud limits
 function refresh(objButton) {
+    if(gameOver) return;
     var varName = "grabChip"; // your cloud variable name goes here
     $.ajax({
       url: baseURL + deviceID + '/' + varName,
@@ -190,6 +192,7 @@ function resetBoard(objButton) {
         board[row][col]=0;
     }
   }
+  gameOver=false;
   updateBoardUI();
   //calls photon function
   //event.preventDefault();

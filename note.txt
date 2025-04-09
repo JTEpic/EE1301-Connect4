@@ -9,5 +9,6 @@ checkwin in photon code (use cloud function?)/LED animation based by player
 
 things to enable when done:
 
+javascript photon2 access keys
 javascript auto refresh line
 javascript handleClick player switching line

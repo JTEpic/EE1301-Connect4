@@ -23,7 +23,6 @@ int board[yLength][xLength];
 //adjust pins for final physical setup
 const int pinCol[xLength]={D7,0,0,0,0,0,0};
 int pinData[xLength];
-const int LIGHT_SENSOR_THRESHOLD=2500;
 String sendCoord="null";
 
 // IMPORTANT: Set pixel COUNT, PIN and TYPE
@@ -67,15 +66,15 @@ void setup() {
 int pinPrev=-1;
 void loop() {
   //check if sensor is still covered
-  if(pinPrev!=-1&&pinData[pinPrev] < LIGHT_SENSOR_THRESHOLD){
+  if(pinPrev!=-1&&digitalRead(pinCol[pinPrev]) == 0){
     pinPrev=-1;
   }
 
   //goes through all sensors to see if one is covered
   if(pinPrev==-1){
     for(int x = 0; x < xLength; x++){
-      pinData[x] = analogRead(pinCol[x]);
-      if(pinData[x] > LIGHT_SENSOR_THRESHOLD){
+      pinData[x] = digitalRead(pinCol[x]);
+      if(pinData[x] != 0){
         pinPrev=x;
         int row = getLowestEmptyRow(x);
         if(row != -1){
@@ -117,6 +116,7 @@ int getLowestEmptyRow(int col) {
         return row;
       }
   }
+  Serial.println("Row = -1");
   return -1;
 }
 
