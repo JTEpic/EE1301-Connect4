@@ -155,19 +155,23 @@ function refresh(objButton) {
       method: 'GET',
       success: function (resp) {
         document.getElementById("data1").innerText = resp.result;
+        console.log(resp.result);
         const temp=JSON.stringify(resp.result);
         if(temp!="null"){
           //see if coord is empty and set
           //find location of comma
           let loc = 0;
-          for (let x = 0; x < temp.length(); x++){
+          for (let x = 0; x < temp.length; x++){
             if (temp.charAt(x) == ',') {
               loc = x;
+              console.log("Loc: "+loc);
               break;
             }
           }
-          let row = Number(temp.substring(0, loc));
-          let col = Number(temp.substring(loc + 1, temp.length()));
+          let row = parseInt(temp.substring(1, loc));
+          console.log("Parsed row: "+row);
+          let col = parseInt(temp.substring(loc + 1, temp.length));
+          console.log("Parsed col: "+col);
           //if board has changed, else same data/no play yet
           if(board[row][col]==0){
             board[row][col] = currentPlayer;

@@ -1,8 +1,8 @@
 current goals:
 
-checkWin to work with different dimensions (4x5?)
+correct LED algorithm?
 led color change delay?
-led use different pins based on row?
+checkWin to work with different dimensions (4x5?)
 player switching on photon
 reset players at launch+reset button
 checkwin in photon code (use cloud function?)/LED animation based by player

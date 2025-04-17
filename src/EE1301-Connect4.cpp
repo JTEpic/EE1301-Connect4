@@ -21,7 +21,7 @@ const int xLength=7,yLength=6;
 int board[yLength][xLength];
 
 //adjust pins for final physical setup
-const int pinCol[xLength]={D7,0,0,0,0,0,0};
+const int pinCol[xLength]={D11,D12,D13,D14,D19,D18,D17};
 int pinData[xLength];
 String sendCoord="null";
 
@@ -79,7 +79,8 @@ void loop() {
         int row = getLowestEmptyRow(x);
         if(row != -1){
           board[row][x] = 2;
-          sendCoord = row+","+x;
+          String temp = ((String)row+","+(String)x);
+          sendCoord = temp;
         }
         break;
       }
@@ -88,16 +89,35 @@ void loop() {
 
   //set light color according to array,add short delay?
   int pix=0;
+  //since LED wraps around
+  bool upward=false;
   for(int x=0;x<xLength;x++){
+    if(upward){
+      //upwards
+      for(int y=yLength-1;y>=0;y--){
+        if(board[y][x]==1)
+          strip.setPixelColor(pix,PixelColorRed);
+        else if(board[y][x]==2){
+          strip.setPixelColor(pix,PixelColorBlue);
+        }else{
+          strip.setPixelColor(pix,PixelColorOff);
+        }
+        pix++;
+      }
+      upward=false;
+    }else{
+      //downwards
     for(int y=0;y<yLength;y++){
       if(board[y][x]==1)
-        strip.setPixelColor(x,PixelColorRed);
+          strip.setPixelColor(pix,PixelColorRed);
       else if(board[y][x]==2){
-        strip.setPixelColor(x,PixelColorBlue);
+          strip.setPixelColor(pix,PixelColorBlue);
       }else{
-        strip.setPixelColor(x,PixelColorOff);
+          strip.setPixelColor(pix,PixelColorOff);
       }
       pix++;
+      }
+      upward=true;
     }
   }
   strip.show();
@@ -112,7 +132,8 @@ int getLowestEmptyRow(int col) {
   for (int row = yLength-1; row >= 0; row--) {
   //for(let row=0;row<yLength;row++){
       if (board[row][col] == 0){
-        Serial.println(col+","+row);
+        String temp = ((String)col+","+(String)row);
+        Serial.println(temp);
         return row;
       }
   }
@@ -123,7 +144,7 @@ int getLowestEmptyRow(int col) {
 //gets webpage coordinate string as row,col and sets array accordingly
 //error if this cloud function too long?
 int setBoardFromString(String inputString){
-  Serial.println(inputString);
+  Serial.println("Cloud: "+inputString);
 
   //find location of comma
   int loc=0;
@@ -146,5 +167,6 @@ int resetBoard(String inputString){
       board[y][x]=0;
     }
   }
+  Serial.println("Reset Board");
   return 1;
 }
