@@ -21,7 +21,7 @@ const int xLength=7,yLength=6;
 int board[yLength][xLength];
 
 //adjust pins for final physical setup
-const int pinCol[xLength]={D11,D12,D13,D14,D19,D18,D17};
+const int pinCol[xLength]={D11,D12,D13,D14,D19,D18,D8};
 int pinData[xLength];
 String sendCoord="null";
 
@@ -33,14 +33,10 @@ int PIXEL_TYPE = WS2812;
 
 Adafruit_NeoPixel strip = Adafruit_NeoPixel(PIXEL_COUNT, PIXEL_PIN, PIXEL_TYPE);
 //Setup some colors, RGB version
-/*int PixelColorCyan = strip.Color(   0, 100, 100);
-int PixelColorRed  = strip.Color(  80,   0,   0);
-int PixelColorGold = strip.Color(  60,  50,   5);*/
-  
-//Setup some colors, GRB version
-int PixelColorRed = strip.Color(    0,  100, 0  );
-int PixelColorBlue  = strip.Color(  0,  0,   100);
-int PixelColorOff = strip.Color(    0,  0,   0  );
+int PixelColorRed = strip.Color(    100, 0, 0  );
+int PixelColorBlue  = strip.Color(  0,   0, 100);
+int PixelColorOff = strip.Color(    0,   0, 0  );
+bool updateLED=true;
 
 void setup() {
   //reset array on boot, (0=open, 1=player 1 (cloud), 2=player 2 (photon))
@@ -66,19 +62,24 @@ void setup() {
 int pinPrev=-1;
 void loop() {
   //check if sensor is still covered
-  if(pinPrev!=-1&&digitalRead(pinCol[pinPrev]) == 0){
-    pinPrev=-1;
+  if(pinPrev!=-1){
+    if(digitalRead(pinCol[pinPrev])==HIGH){
+      Serial.println("Unlocked IR: "+(String)pinCol[pinPrev]);
+      pinPrev=-1;
+    }else{
+      Serial.println("Locked IR: "+(String)pinCol[pinPrev]);
+    }
   }
-
   //goes through all sensors to see if one is covered
   if(pinPrev==-1){
     for(int x = 0; x < xLength; x++){
       pinData[x] = digitalRead(pinCol[x]);
-      if(pinData[x] != 0){
+      if(pinData[x] != HIGH){
         pinPrev=x;
         int row = getLowestEmptyRow(x);
         if(row != -1){
           board[row][x] = 2;
+          updateLED=true;
           String temp = ((String)row+","+(String)x);
           sendCoord = temp;
         }
@@ -87,44 +88,57 @@ void loop() {
     }
   }
 
-  //set light color according to array,add short delay?
-  int pix=0;
-  //since LED wraps around
-  bool upward=false;
-  for(int x=0;x<xLength;x++){
-    if(upward){
-      //upwards
-      for(int y=yLength-1;y>=0;y--){
-        if(board[y][x]==1)
-          strip.setPixelColor(pix,PixelColorRed);
-        else if(board[y][x]==2){
-          strip.setPixelColor(pix,PixelColorBlue);
-        }else{
-          strip.setPixelColor(pix,PixelColorOff);
-        }
-        pix++;
-      }
-      upward=false;
-    }else{
-      //downwards
+  //set light color according to array
+  if(updateLED){
+    Serial.println();
     for(int y=0;y<yLength;y++){
-      if(board[y][x]==1)
-          strip.setPixelColor(pix,PixelColorRed);
-      else if(board[y][x]==2){
-          strip.setPixelColor(pix,PixelColorBlue);
-      }else{
-          strip.setPixelColor(pix,PixelColorOff);
+      for(int x=0;x<xLength;x++){
+        Serial.print(board[y][x]);
       }
-      pix++;
-      }
-      upward=true;
+      Serial.println();
     }
+    Serial.println();
+
+    Serial.println("Updating LED");
+    int pix = 0;
+    // since LED wraps around
+    bool upward = false;
+    for (int x = 0; x < xLength; x++){
+      if(upward){
+        // upwards
+        for (int y = yLength - 1; y >= 0; y--){
+          if (board[y][x] == 1)
+            strip.setPixelColor(pix, PixelColorRed);
+          else if (board[y][x] == 2)
+            strip.setPixelColor(pix, PixelColorBlue);
+          else
+            strip.setPixelColor(pix, PixelColorOff);
+          pix++;
+        }
+        upward = false;
+      }
+      else{
+        // downwards
+        for (int y = 0; y < yLength; y++)
+        {
+          if (board[y][x] == 1)
+            strip.setPixelColor(pix, PixelColorRed);
+          else if (board[y][x] == 2)
+            strip.setPixelColor(pix, PixelColorBlue);
+          else
+            strip.setPixelColor(pix, PixelColorOff);
+          pix++;
+        }
+        upward = true;
+      }
+    }
+    strip.show();
+    updateLED=false;
   }
-  strip.show();
 
   // Log.info("Sending Hello World to the cloud");
   // Particle.publish("Hello world");
-  // delay(1000); // milliseconds and blocking
+   delay(50); // milliseconds and blocking
 }
 
 //returns lowest empty row
@@ -137,7 +151,7 @@ int getLowestEmptyRow(int col) {
         return row;
       }
   }
-  Serial.println("Row = -1");
+  Serial.println("Row Full at Col: "+(String)col);
   return -1;
 }
 
@@ -157,6 +171,7 @@ int setBoardFromString(String inputString){
   int row=atoi(inputString.substring(0,loc));
   int col=atoi(inputString.substring(loc+1,inputString.length()));
   board[row][col]=1;
+  updateLED=true;
   return 1;
 }
 
@@ -167,6 +182,8 @@ int resetBoard(String inputString){
       board[y][x]=0;
     }
   }
+  sendCoord="null";
+  updateLED=true;
   Serial.println("Reset Board");
   return 1;
 }

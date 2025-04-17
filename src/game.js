@@ -17,7 +17,7 @@ const boardElement = document.getElementById('board');
 const statusElement = document.getElementById('status');
 
 createBoard();
-//const interval = setInterval(function(){refresh()},2000);
+const interval = setInterval(function(){refresh()},2000);
 
 function createBoard() {
   boardElement.innerHTML = '';
@@ -42,15 +42,13 @@ function createBoard() {
     method: "POST",
     headers: { "Authorization": "Bearer " + accessToken },
     data: { arg: temp },
-    success: () => alert("Message Sent! \n" +
-      "(this doesn't mean it worked! \n" +
-      "i.e., may not have a valid ID/Token/FunctionName/etc.)")
+    success: () => console.log("Reset Board")
   });
 }
 
 function handleClick(e) {
-  if (gameOver) return;
-  //if (gameOver||currentPlayer==2) return;
+  //if (gameOver) return;
+  if (gameOver||currentPlayer==2) return;
   
   const col = parseInt(e.target.dataset.col);
   const row = getLowestEmptyRow(col);
@@ -65,27 +63,26 @@ function handleClick(e) {
       method: "POST",
       headers: { "Authorization": "Bearer " + accessToken },
       data: { arg: temp },
-      success: () => alert("Message Sent! \n" +
-        "(this doesn't mean it worked! \n" +
-        "i.e., may not have a valid ID/Token/FunctionName/etc.)")
+      success: () => console.log("Sent Data")
     });
 
     // Update board array
-    board[row][col] = currentPlayer;
+    board[row][col] = 1;
     // Update UI
     updateBoardUI();
 
     // Check for win
     if (checkWin(row, col)) {
-      statusElement.textContent = `Player ${currentPlayer} (${currentPlayer === 1 ? 'Red' : 'Blue'}) wins!`;
+      console.log("Game Over");
+      statusElement.textContent = `${currentPlayer === 1 ? 'Cloud (Red' : 'Photon (Blue'}) wins!`;
       gameOver = true;
       return;
     }
 
     // Switch player
-    //currentPlayer=2;
+    currentPlayer=2;
     //currentPlayer = currentPlayer === 1 ? 2 : 1;
-    statusElement.textContent = `Player ${currentPlayer} (${currentPlayer === 1 ? 'Red' : 'Blue'})'s turn`;
+    statusElement.textContent = `${currentPlayer === 1 ? 'Cloud (Red' : 'Photon (Blue'})'s turn`;
   }
 }
 
@@ -93,7 +90,7 @@ function getLowestEmptyRow(col) {
   for (let row = yLength-1; row >= 0; row--) {
   //for(let row=0;row<yLength;row++){
       if (board[row][col] === 0){
-        console.log(col+","+row);
+        console.log(row+","+col);
         return row;
       }
   }
@@ -101,7 +98,7 @@ function getLowestEmptyRow(col) {
   return -1;
 }
 
-//breaks if not 6x7
+//breaks if not 6x7 and only checks currentPlayer
 function checkWin(row, col) {
   const directions = [
       [0, 1],  // horizontal
@@ -148,6 +145,7 @@ function updateBoardUI() {
 //refresh data, should be put into a loop according to particle's cloud limits
 function refresh(objButton) {
     if(gameOver) return;
+    //if(gameOver||currentPlayer==1) return;
     var varName = "grabChip"; // your cloud variable name goes here
     $.ajax({
       url: baseURL + deviceID + '/' + varName,
@@ -157,7 +155,8 @@ function refresh(objButton) {
         document.getElementById("data1").innerText = resp.result;
         console.log(resp.result);
         const temp=JSON.stringify(resp.result);
-        if(temp!="null"){
+        //JSON adds "" to outsides
+        if(temp!="\"null\""){
           //see if coord is empty and set
           //find location of comma
           let loc = 0;
@@ -174,15 +173,19 @@ function refresh(objButton) {
           console.log("Parsed col: "+col);
           //if board has changed, else same data/no play yet
           if(board[row][col]==0){
+            //remove later when player locked
+            currentPlayer=2;
             board[row][col] = currentPlayer;
             updateBoardUI();
             // Check for win
             if (checkWin(row, col)) {
-              statusElement.textContent = `Player ${currentPlayer} (${currentPlayer === 1 ? 'Red' : 'Blue'}) wins!`;
+              console.log("Game Over");
+              statusElement.textContent = `${currentPlayer === 1 ? 'Cloud (Red' : 'Photon (Blue'}) wins!`;
               gameOver = true;
+              return;
             }
             currentPlayer=1;
-            statusElement.textContent = `Player ${currentPlayer} (${currentPlayer === 1 ? 'Red' : 'Blue'})'s turn`;
+            statusElement.textContent = `${currentPlayer === 1 ? 'Cloud (Red' : 'Photon (Blue'})'s turn`;
           }
         }
       },
@@ -191,14 +194,7 @@ function refresh(objButton) {
 
 //resets board
 function resetBoard(objButton) {
-  for (let row = 0; row < yLength; row++) {
-    for (let col = 0; col < xLength; col++) {
-        board[row][col]=0;
-    }
-  }
-  gameOver=false;
-  updateBoardUI();
-  //calls photon function
+  //resets photon, calls photon function
   //event.preventDefault();
   var functionName = "resetBoard"; // local variable functionName
   //empty temp necessary?
@@ -208,8 +204,16 @@ function resetBoard(objButton) {
     method: "POST",
     headers: { "Authorization": "Bearer " + accessToken },
     data: { arg: temp },
-    success: () => alert("Message Sent! \n" +
-      "(this doesn't mean it worked! \n" +
-      "i.e., may not have a valid ID/Token/FunctionName/etc.)")
+    success: () => console.log("Reset Board")
   });
+
+  //resets site
+  for (let row = 0; row < yLength; row++) {
+    for (let col = 0; col < xLength; col++) {
+        board[row][col]=0;
+    }
+  }
+  updateBoardUI();
+  statusElement.textContent = `${currentPlayer === 1 ? 'Cloud (Red' : 'Photon (Blue'})'s turn`;
+  gameOver=false;
 }

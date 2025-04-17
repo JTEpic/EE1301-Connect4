@@ -1,11 +1,12 @@
 current goals:
 
-correct LED algorithm?
-led color change delay?
-checkWin to work with different dimensions (4x5?)
-player switching on photon
-reset players at launch+reset button
+desync sendCoord since photon too fast,solution to refresh faster
+correct LED algorithm? needs to use multiple per section and skip
+resetBoard, put into success function
+player switching on photon,reset players at launch+reset button
 checkwin in photon code (use cloud function?)/LED animation based by player
+
+checkWin to work with different dimensions (4x5)?
 
 things to enable when done:
 
