@@ -36,15 +36,15 @@ Adafruit_NeoPixel strip = Adafruit_NeoPixel(PIXEL_COUNT, PIXEL_PIN, PIXEL_TYPE);
 int PixelColorRed = strip.Color(    100, 0, 0  );
 int PixelColorBlue  = strip.Color(  0,   0, 100);
 int PixelColorOff = strip.Color(    0,   0, 0  );
-int PIX_PER_HOLE=3;
-int INITAL_OFFSET=0;
+int PIX_PER_HOLE=4;
+int INITAL_OFFSET=2;
 //since LED strip wraps around,see num of pixels skipped,big offsets align with LED wrap around
-int OFFSET[yLength][xLength]={{5,2,5,2,5,2,0},
-                              {2,2,2,3,2,2,2},
-                              {2,2,2,3,2,2,3},
-                              {2,2,2,3,2,2,2},
-                              {2,2,2,3,2,2,2},
-                              {2,5,2,5,2,5,2}};
+int OFFSET[yLength][xLength]={{2,16,2,  15,0,15,0},
+                              {2,2 ,2,  0,0,0,0},
+                              {2,1 ,1  ,3,0,0,0},
+                              {1,2 ,2,3,  0,0,0},
+                              {2,2 ,2,3,  0,0,0},
+                              {3,2 ,3,2,  3,0,0}};
 bool updateLED=true;
 
 void setup() {
@@ -58,7 +58,7 @@ void setup() {
     pinMode(pinCol[x], INPUT);
   }
   strip.begin();
-  for(int x=0;x<xLength*yLength;x++){
+  for(int x=0;x<PIXEL_COUNT;x++){
     strip.setPixelColor(x,PixelColorOff);
   }
   strip.show();
@@ -109,9 +109,15 @@ void loop() {
     Serial.println();
 
     Serial.println("Updating LED");
+
+    //reset board to off
+    for(int x=0;x<PIXEL_COUNT;x++){
+      strip.setPixelColor(x,PixelColorOff);
+    }
+
     int pix = INITAL_OFFSET;
     // since LED wraps around
-    bool upward = true;
+    bool upward = false;
     for (int x = 0; x < xLength; x++){
       if(upward){
         // upwards
@@ -120,14 +126,17 @@ void loop() {
             strip.setPixelColor(pix, PixelColorRed);
             strip.setPixelColor(pix+1, PixelColorRed);
             strip.setPixelColor(pix+2, PixelColorRed);
+            strip.setPixelColor(pix+3, PixelColorRed);
           }else if (board[y][x] == 2){
             strip.setPixelColor(pix, PixelColorBlue);
             strip.setPixelColor(pix+1, PixelColorBlue);
             strip.setPixelColor(pix+2, PixelColorBlue);
+            strip.setPixelColor(pix+3, PixelColorBlue);
           }else{
             strip.setPixelColor(pix, PixelColorOff);
             strip.setPixelColor(pix+1, PixelColorOff);
             strip.setPixelColor(pix+2, PixelColorOff);
+            strip.setPixelColor(pix+3, PixelColorOff);
           }
           pix+=PIX_PER_HOLE;
           pix+=OFFSET[y][x];
@@ -143,14 +152,17 @@ void loop() {
             strip.setPixelColor(pix, PixelColorRed);
             strip.setPixelColor(pix+1, PixelColorRed);
             strip.setPixelColor(pix+2, PixelColorRed);
+            strip.setPixelColor(pix+3, PixelColorRed);
           }else if (board[y][x] == 2){
             strip.setPixelColor(pix, PixelColorBlue);
             strip.setPixelColor(pix+1, PixelColorBlue);
             strip.setPixelColor(pix+2, PixelColorBlue);
+            strip.setPixelColor(pix+3, PixelColorBlue);
           }else{
             strip.setPixelColor(pix, PixelColorOff);
             strip.setPixelColor(pix+1, PixelColorOff);
             strip.setPixelColor(pix+2, PixelColorOff);
+            strip.setPixelColor(pix+3, PixelColorOff);
           }
           pix+=PIX_PER_HOLE;
           pix+=OFFSET[y][x];
