@@ -1,13 +1,12 @@
 current goals:
 
-desync sendCoord since photon too fast,player switching on photon,reset players at launch+reset button
 checkwin in photon code (use cloud function?)/LED animation win based by player
-resetBoard, put into success function
 
+javascript resetBoard, put into success function
 checkWin to work with different dimensions (4x5)
+reset players at launch+reset button
 
 things to enable when done:
 
 javascript photon2 access keys
 javascript auto refresh line
-javascript handleClick player switching line

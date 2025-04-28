@@ -19,6 +19,7 @@ SerialLogHandler logHandler(LOG_LEVEL_INFO);
 //yLength is row,xLength is column,board[row][column]
 const int xLength=7,yLength=6;
 int board[yLength][xLength];
+int currentPlayer = 2; //1=player 1(red)(cloud), 2=player 2(blue)(photon)
 
 //adjust pins for final physical setup
 const int pinCol[xLength]={D11,D12,D13,D14,D19,D18,D8};
@@ -80,7 +81,7 @@ void loop() {
     }
   }
   //goes through all sensors to see if one is covered
-  if(pinPrev==-1){
+  if(currentPlayer==2 && pinPrev==-1){
     for(int x = 0; x < xLength; x++){
       pinData[x] = digitalRead(pinCol[x]);
       if(pinData[x] != HIGH){
@@ -91,6 +92,7 @@ void loop() {
           updateLED=true;
           String temp = ((String)row+","+(String)x);
           sendCoord = temp;
+          currentPlayer=1;
         }
         break;
       }
@@ -203,6 +205,7 @@ int setBoardFromString(String inputString){
   int col=atoi(inputString.substring(loc+1,inputString.length()));
   board[row][col]=1;
   updateLED=true;
+  currentPlayer=2;
   return 1;
 }
 
