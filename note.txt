@@ -1,12 +1,10 @@
 current goals:
 
-correct LED algorithm?
 desync sendCoord since photon too fast,player switching on photon,reset players at launch+reset button
 checkwin in photon code (use cloud function?)/LED animation win based by player
 resetBoard, put into success function
 
 checkWin to work with different dimensions (4x5)
-LED for loop
 
 things to enable when done:
 

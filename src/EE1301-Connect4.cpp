@@ -27,24 +27,24 @@ String sendCoord="null";
 
 // IMPORTANT: Set pixel COUNT, PIN and TYPE
 //int PIXEL_COUNT = INITAL_OFFSET+PIX_PER_HOLE*xLength*yLength+offsetvalues;
-int PIXEL_COUNT = 290;
-#define PIXEL_PIN SPI // Only use SPI or SPI1 on Photon 2 (SPI is MO or S0 pin; SPI1 is D2)
+int PIXEL_COUNT = 297;
+#define PIXEL_PIN SPI1 // Only use SPI or SPI1 on Photon 2 (SPI is MO or S0 pin; SPI1 is D2)
                       // NOTE: On the Photon 2, this must be a compiler constant!
 int PIXEL_TYPE = WS2812;
 Adafruit_NeoPixel strip = Adafruit_NeoPixel(PIXEL_COUNT, PIXEL_PIN, PIXEL_TYPE);
 //Setup some colors, RGB version
-int PixelColorRed = strip.Color(    100, 0, 0  );
-int PixelColorBlue  = strip.Color(  0,   0, 100);
+int PixelColorRed = strip.Color(    200, 0, 0  );
+int PixelColorBlue  = strip.Color(  0,   0, 200);
 int PixelColorOff = strip.Color(    0,   0, 0  );
 int PIX_PER_HOLE=4;
 int INITAL_OFFSET=2;
 //since LED strip wraps around,see num of pixels skipped,big offsets align with LED wrap around
-int OFFSET[yLength][xLength]={{2,16,2,  15,0,15,0},
-                              {2,2 ,2,  0,0,0,0},
-                              {2,1 ,1  ,3,0,0,0},
-                              {1,2 ,2,3,  0,0,0},
-                              {2,2 ,2,3,  0,0,0},
-                              {3,2 ,3,2,  3,0,0}};
+int OFFSET[yLength][xLength]={{2,16,2,  15,2,15,2},
+                              {2,2 ,2,  1, 1,2,2},
+                              {2,1 ,1  ,1, 2,2,2},
+                              {1,2 ,2,2,  2,2,2},
+                              {2,2 ,2,3,  2,2,2},
+                              {0,2 ,3,2,  3,2,0}};
 bool updateLED=true;
 
 void setup() {
@@ -123,25 +123,21 @@ void loop() {
         // upwards
         for (int y = yLength - 1; y >= 0; y--){
           if (board[y][x] == 1){
-            strip.setPixelColor(pix, PixelColorRed);
-            strip.setPixelColor(pix+1, PixelColorRed);
-            strip.setPixelColor(pix+2, PixelColorRed);
-            strip.setPixelColor(pix+3, PixelColorRed);
+            for(int z=pix;z<(pix+PIX_PER_HOLE);z++){
+              strip.setPixelColor(z, PixelColorRed);
+            }
           }else if (board[y][x] == 2){
-            strip.setPixelColor(pix, PixelColorBlue);
-            strip.setPixelColor(pix+1, PixelColorBlue);
-            strip.setPixelColor(pix+2, PixelColorBlue);
-            strip.setPixelColor(pix+3, PixelColorBlue);
+            for(int z=pix;z<(pix+PIX_PER_HOLE);z++){
+              strip.setPixelColor(z, PixelColorBlue);
+            }
           }else{
-            strip.setPixelColor(pix, PixelColorOff);
-            strip.setPixelColor(pix+1, PixelColorOff);
-            strip.setPixelColor(pix+2, PixelColorOff);
-            strip.setPixelColor(pix+3, PixelColorOff);
+            for(int z=pix;z<(pix+PIX_PER_HOLE);z++){
+              strip.setPixelColor(z, PixelColorOff);
+            }
           }
           pix+=PIX_PER_HOLE;
           pix+=OFFSET[y][x];
         }
-        //pix+=OFFSET[0][x]; already covered above?
         upward = false;
       }
       else{
@@ -149,25 +145,21 @@ void loop() {
         for (int y = 0; y < yLength; y++)
         {
           if (board[y][x] == 1){
-            strip.setPixelColor(pix, PixelColorRed);
-            strip.setPixelColor(pix+1, PixelColorRed);
-            strip.setPixelColor(pix+2, PixelColorRed);
-            strip.setPixelColor(pix+3, PixelColorRed);
+            for(int z=pix;z<(pix+PIX_PER_HOLE);z++){
+              strip.setPixelColor(z, PixelColorRed);
+            }
           }else if (board[y][x] == 2){
-            strip.setPixelColor(pix, PixelColorBlue);
-            strip.setPixelColor(pix+1, PixelColorBlue);
-            strip.setPixelColor(pix+2, PixelColorBlue);
-            strip.setPixelColor(pix+3, PixelColorBlue);
+            for(int z=pix;z<(pix+PIX_PER_HOLE);z++){
+              strip.setPixelColor(z, PixelColorBlue);
+            }
           }else{
-            strip.setPixelColor(pix, PixelColorOff);
-            strip.setPixelColor(pix+1, PixelColorOff);
-            strip.setPixelColor(pix+2, PixelColorOff);
-            strip.setPixelColor(pix+3, PixelColorOff);
+            for(int z=pix;z<(pix+PIX_PER_HOLE);z++){
+              strip.setPixelColor(z, PixelColorOff);
+            }
           }
           pix+=PIX_PER_HOLE;
           pix+=OFFSET[y][x];
         }
-        //pix+=OFFSET[0][x];
         upward = true;
       }
     }
