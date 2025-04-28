@@ -76,6 +76,7 @@ function handleClick(e) {
       console.log("Game Over");
       statusElement.textContent = `${currentPlayer === 1 ? 'Cloud (Red' : 'Photon (Blue'}) wins!`;
       gameOver = true;
+      sendWin();
       return;
     }
 
@@ -182,6 +183,7 @@ function refresh(objButton) {
               console.log("Game Over");
               statusElement.textContent = `${currentPlayer === 1 ? 'Cloud (Red' : 'Photon (Blue'}) wins!`;
               gameOver = true;
+              sendWin();
               return;
             }
             currentPlayer=1;
@@ -216,4 +218,19 @@ function resetBoard(objButton) {
   updateBoardUI();
   statusElement.textContent = `${currentPlayer === 1 ? 'Cloud (Red' : 'Photon (Blue'})'s turn`;
   gameOver=false;
+}
+
+//tells board of win
+function sendWin(objButton) {
+  //calls photon function
+  //event.preventDefault();
+  var functionName = "setWin"; // local variable functionName
+  const temp = currentPlayer;
+  $.ajax({
+    url: 'https://api.particle.io/v1/devices/' + deviceID + '/' + functionName,
+    method: "POST",
+    headers: { "Authorization": "Bearer " + accessToken },
+    data: { arg: temp },
+    success: () => console.log("Sent Win")
+  });
 }

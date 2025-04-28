@@ -5,6 +5,7 @@
 int getLowestEmptyRow(int col);
 int setBoardFromString(String inputString);
 int resetBoard(String inputString);
+int setWinBoard(String inputString);
 
 // Let Device OS manage the connection to the Particle Cloud
 SYSTEM_MODE(AUTOMATIC);
@@ -20,6 +21,7 @@ SerialLogHandler logHandler(LOG_LEVEL_INFO);
 const int xLength=7,yLength=6;
 int board[yLength][xLength];
 int currentPlayer = 2; //1=player 1(red)(cloud), 2=player 2(blue)(photon)
+int gameOver=0;
 
 //adjust pins for final physical setup
 const int pinCol[xLength]={D11,D12,D13,D14,D19,D18,D8};
@@ -66,6 +68,7 @@ void setup() {
   Particle.variable("grabChip", sendCoord);
   Particle.function("setBoard", setBoardFromString);
   Particle.function("resetBoard", resetBoard);
+  Particle.function("setWin", setWinBoard);
   Serial.begin(9600);
 }
 
@@ -99,7 +102,7 @@ void loop() {
     }
   }
 
-  //set light color according to array
+  //set light color according to array or winner
   if(updateLED){
     Serial.println();
     for(int y=0;y<yLength;y++){
@@ -112,61 +115,75 @@ void loop() {
 
     Serial.println("Updating LED");
 
-    //reset board to off
-    for(int x=0;x<PIXEL_COUNT;x++){
-      strip.setPixelColor(x,PixelColorOff);
-    }
+    if(gameOver!=0){
+      for(int x=0;x<PIXEL_COUNT;x++){
+        if(gameOver==1)
+          strip.setPixelColor(x,PixelColorRed);
+        else if(gameOver==2)
+          strip.setPixelColor(x,PixelColorBlue);
+        else
+          break;
+        delay(100);
+      }
+      delay(5s);
+    }else{
 
-    int pix = INITAL_OFFSET;
-    // since LED wraps around
-    bool upward = false;
-    for (int x = 0; x < xLength; x++){
-      if(upward){
-        // upwards
-        for (int y = yLength - 1; y >= 0; y--){
-          if (board[y][x] == 1){
-            for(int z=pix;z<(pix+PIX_PER_HOLE);z++){
-              strip.setPixelColor(z, PixelColorRed);
-            }
-          }else if (board[y][x] == 2){
-            for(int z=pix;z<(pix+PIX_PER_HOLE);z++){
-              strip.setPixelColor(z, PixelColorBlue);
-            }
-          }else{
-            for(int z=pix;z<(pix+PIX_PER_HOLE);z++){
-              strip.setPixelColor(z, PixelColorOff);
-            }
-          }
-          pix+=PIX_PER_HOLE;
-          pix+=OFFSET[y][x];
-        }
-        upward = false;
+      //reset board to off
+      for(int x=0;x<PIXEL_COUNT;x++){
+        strip.setPixelColor(x,PixelColorOff);
       }
-      else{
-        // downwards
-        for (int y = 0; y < yLength; y++)
-        {
-          if (board[y][x] == 1){
-            for(int z=pix;z<(pix+PIX_PER_HOLE);z++){
-              strip.setPixelColor(z, PixelColorRed);
+
+      int pix = INITAL_OFFSET;
+      // since LED wraps around
+      bool upward = false;
+      for (int x = 0; x < xLength; x++){
+        if(upward){
+          // upwards
+          for (int y = yLength - 1; y >= 0; y--){
+            if (board[y][x] == 1){
+              for(int z=pix;z<(pix+PIX_PER_HOLE);z++){
+                strip.setPixelColor(z, PixelColorRed);
+              }
+            }else if (board[y][x] == 2){
+              for(int z=pix;z<(pix+PIX_PER_HOLE);z++){
+                strip.setPixelColor(z, PixelColorBlue);
+              }
+            }else{
+              for(int z=pix;z<(pix+PIX_PER_HOLE);z++){
+                strip.setPixelColor(z, PixelColorOff);
+              }
             }
-          }else if (board[y][x] == 2){
-            for(int z=pix;z<(pix+PIX_PER_HOLE);z++){
-              strip.setPixelColor(z, PixelColorBlue);
-            }
-          }else{
-            for(int z=pix;z<(pix+PIX_PER_HOLE);z++){
-              strip.setPixelColor(z, PixelColorOff);
-            }
+            pix+=PIX_PER_HOLE;
+            pix+=OFFSET[y][x];
           }
-          pix+=PIX_PER_HOLE;
-          pix+=OFFSET[y][x];
+          upward = false;
         }
-        upward = true;
+        else{
+          // downwards
+          for (int y = 0; y < yLength; y++)
+          {
+            if (board[y][x] == 1){
+              for(int z=pix;z<(pix+PIX_PER_HOLE);z++){
+                strip.setPixelColor(z, PixelColorRed);
+              }
+            }else if (board[y][x] == 2){
+              for(int z=pix;z<(pix+PIX_PER_HOLE);z++){
+                strip.setPixelColor(z, PixelColorBlue);
+              }
+            }else{
+              for(int z=pix;z<(pix+PIX_PER_HOLE);z++){
+                strip.setPixelColor(z, PixelColorOff);
+              }
+            }
+            pix+=PIX_PER_HOLE;
+            pix+=OFFSET[y][x];
+          }
+          upward = true;
+        }
       }
+      strip.show();
+      updateLED=false;
     }
-    strip.show();
-    updateLED=false;
   }
 
   // Log.info("Sending Hello World to the cloud");
@@ -217,7 +234,15 @@ int resetBoard(String inputString){
     }
   }
   sendCoord="null";
+  gameOver=0;
   updateLED=true;
   Serial.println("Reset Board");
+  return 1;
+}
+
+int setWinBoard(String inputString){
+  gameOver=atoi(inputString);
+  Serial.println("Winner: "+(String)gameOver);
+  updateLED=true;
   return 1;
 }

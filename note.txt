@@ -1,10 +1,11 @@
 current goals:
 
-checkwin in photon code (use cloud function?)/LED animation win based by player
+
 
 javascript resetBoard, put into success function
 checkWin to work with different dimensions (4x5)
 reset players at launch+reset button
+stop photon from updating on gameOver
 
 things to enable when done:
 
