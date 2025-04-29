@@ -115,6 +115,7 @@ void loop() {
 
     Serial.println("Updating LED");
 
+    //winning animation
     if(gameOver!=0){
       for(int x=0;x<PIXEL_COUNT;x++){
         if(gameOver==1)
@@ -123,9 +124,18 @@ void loop() {
           strip.setPixelColor(x,PixelColorBlue);
         else
           break;
-        delay(100);
+        strip.show();
+        delay(50);
+        //in case resetBoard called during animation (prev delay too short to do it)
+        if(x%20==0)
+          Particle.process();
       }
       delay(5s);
+      //reset board to off
+      for(int x=0;x<PIXEL_COUNT;x++){
+        strip.setPixelColor(x,PixelColorOff);
+      }
+      strip.show();
     }else{
 
       //reset board to off
@@ -235,6 +245,7 @@ int resetBoard(String inputString){
   }
   sendCoord="null";
   gameOver=0;
+  currentPlayer=2;
   updateLED=true;
   Serial.println("Reset Board");
   return 1;

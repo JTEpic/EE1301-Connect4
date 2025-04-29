@@ -1,10 +1,10 @@
 current goals:
 
-
+javascript fix constant cloud variable refresh as uses monthly tokens
 
 javascript resetBoard, put into success function
 checkWin to work with different dimensions (4x5)
-reset players at launch+reset button
+reset players at launch
 stop photon from updating on gameOver
 
 things to enable when done:

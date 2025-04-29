@@ -17,7 +17,7 @@ const boardElement = document.getElementById('board');
 const statusElement = document.getElementById('status');
 
 createBoard();
-const interval = setInterval(function(){refresh()},2000);
+const interval = setInterval(function(){refresh()},1500);
 
 function createBoard() {
   boardElement.innerHTML = '';
@@ -216,6 +216,7 @@ function resetBoard(objButton) {
     }
   }
   updateBoardUI();
+  currentPlayer=1;
   statusElement.textContent = `${currentPlayer === 1 ? 'Cloud (Red' : 'Photon (Blue'})'s turn`;
   gameOver=false;
 }
