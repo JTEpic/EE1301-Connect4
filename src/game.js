@@ -5,6 +5,7 @@ var accessToken = "";
 var baseURL = "https://api.particle.io/v1/devices/"
 
 document.getElementById("data1").innerHTML = "REFRESH";
+const TRIES_UNTIL_STOP = 5;
 
 const xLength=7,yLength=6;
 //create array and set all to 0, (0=open, 1=player 1(red), 2=player 2(blue)), 6x7
@@ -42,7 +43,8 @@ function createBoard() {
     method: "POST",
     headers: { "Authorization": "Bearer " + accessToken },
     data: { arg: temp },
-    success: () => console.log("Reset Board")
+    success: () => console.log("Reset Board"),
+    error: () => console.log("Fail Send")
   });
 }
 
@@ -55,16 +57,7 @@ function handleClick(e) {
   
   if (row !== -1) {
     //send coord to board
-    //event.preventDefault();
-    var functionName = "setBoard"; // local variable functionName
-    const temp=row+","+col;
-    $.ajax({
-      url: 'https://api.particle.io/v1/devices/' + deviceID + '/' + functionName,
-      method: "POST",
-      headers: { "Authorization": "Bearer " + accessToken },
-      data: { arg: temp },
-      success: () => console.log("Sent Data")
-    });
+    sendBoard(row,col);
 
     // Update board array
     board[row][col] = 1;
@@ -97,6 +90,32 @@ function getLowestEmptyRow(col) {
   }
   console.log("Row = -1");
   return -1;
+}
+
+//send coord to board
+let triesSend=0;
+function sendBoard(row,col){
+  //event.preventDefault();
+  var functionName = "setBoard"; // local variable functionName
+  const temp=row+","+col;
+  $.ajax({
+    url: 'https://api.particle.io/v1/devices/' + deviceID + '/' + functionName,
+    method: "POST",
+    headers: { "Authorization": "Bearer " + accessToken },
+    data: { arg: temp },
+    success: function(resp){
+      console.log("Sent Data");
+      triesSend=0;
+    },
+    error: function(resp){
+      console.log("Fail Send");
+      triesSend++;
+      if(triesSend<TRIES_UNTIL_STOP)
+        sendBoard(row,col);
+      else
+        triesSend=0;
+    }
+  });
 }
 
 //breaks if not 6x7 and only checks currentPlayer
@@ -190,7 +209,7 @@ function refresh(objButton) {
             statusElement.textContent = `${currentPlayer === 1 ? 'Cloud (Red' : 'Photon (Blue'})'s turn`;
           }
         }
-      },
+      }
     });
 }
 
@@ -206,22 +225,25 @@ function resetBoard(objButton) {
     method: "POST",
     headers: { "Authorization": "Bearer " + accessToken },
     data: { arg: temp },
-    success: () => console.log("Reset Board")
+    success: function(resp){
+      console.log("Reset Board");
+      //resets site
+      for (let row = 0; row < yLength; row++) {
+        for (let col = 0; col < xLength; col++) {
+          board[row][col]=0;
+        }
+      }
+      updateBoardUI();
+      currentPlayer=1;
+      statusElement.textContent = `${currentPlayer === 1 ? 'Cloud (Red' : 'Photon (Blue'})'s turn`;
+      gameOver=false;
+    },
+    error: () => console.log("Fail Send")
   });
-
-  //resets site
-  for (let row = 0; row < yLength; row++) {
-    for (let col = 0; col < xLength; col++) {
-        board[row][col]=0;
-    }
-  }
-  updateBoardUI();
-  currentPlayer=1;
-  statusElement.textContent = `${currentPlayer === 1 ? 'Cloud (Red' : 'Photon (Blue'})'s turn`;
-  gameOver=false;
 }
 
 //tells board of win
+let triesWin=0;
 function sendWin(objButton) {
   //calls photon function
   //event.preventDefault();
@@ -232,6 +254,17 @@ function sendWin(objButton) {
     method: "POST",
     headers: { "Authorization": "Bearer " + accessToken },
     data: { arg: temp },
-    success: () => console.log("Sent Win")
+    success: function(resp){
+      console.log("Sent Win");
+      triesWin=0;
+    },
+    error: function(resp){
+      console.log("Fail Send");
+      triesWin++;
+      if(triesWin<TRIES_UNTIL_STOP)
+        sendWin();
+      else
+        triesWin=0;
+    }
   });
 }

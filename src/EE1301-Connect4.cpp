@@ -127,15 +127,19 @@ void loop() {
         strip.show();
         delay(50);
         //in case resetBoard called during animation (prev delay too short to do it)
-        if(x%20==0)
+        if(x%30==0)
           Particle.process();
       }
-      delay(5s);
+      //skip delay if board was reset
+      if(gameOver!=0)
+        delay(4s);
       //reset board to off
-      for(int x=0;x<PIXEL_COUNT;x++){
-        strip.setPixelColor(x,PixelColorOff);
+      if(gameOver!=0){
+        for(int x=0;x<PIXEL_COUNT;x++){
+          strip.setPixelColor(x,PixelColorOff);
+        }
+        strip.show();
       }
-      strip.show();
     }else{
 
       //reset board to off
